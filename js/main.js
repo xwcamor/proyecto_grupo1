@@ -1,0 +1,256 @@
+import * as THREE from 'three';
+import { ajustarX,ajustarZ,compactarFranja } from './franja-campus.js?v=borde-295';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
+import { CONFIG } from './config.js?v=torre-b-341';
+import { ajustarPizarraFinal } from './piedra-piso.js?v=pizarra-279';
+import { crearTorres } from './floors/registro.js?v=columnas-351';
+import { crearExteriores } from './exteriores.js?v=piso-353';
+import { crearRecorrido } from './recorrido.js?v=pasillos-292';
+import { crearPuertasFachada } from './puertas.js?v=rejas-abribles-174';
+import { crearServicioElevadores } from './elevadores.js?v=jardin-350';
+import { crearBebederos } from './bebederos.js?v=columnas-bebederos-210';
+import { crearExpendedoras } from './expendedoras.js?v=358';
+
+const visor=document.querySelector('#visor');
+const error=document.querySelector('#error');
+let renderer;
+try{
+  renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+}catch(e){
+  error.hidden=false;error.textContent='No se puede iniciar WebGL. Comprueba que la aceleración por hardware esté activada en tu navegador.';
+  throw e;
+}
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.setSize(visor.clientWidth,visor.clientHeight);
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.35;
+visor.prepend(renderer.domElement);
+
+const etiquetas=new CSS2DRenderer();
+etiquetas.setSize(visor.clientWidth,visor.clientHeight);
+etiquetas.domElement.style.position='absolute';
+etiquetas.domElement.style.top='0';
+etiquetas.domElement.style.left='0';
+etiquetas.domElement.style.pointerEvents='none';
+visor.appendChild(etiquetas.domElement);
+
+const escena=new THREE.Scene();
+escena.background=new THREE.Color('#273b4e');
+escena.fog=new THREE.Fog('#273b4e',155,275);
+const camara=new THREE.PerspectiveCamera(48,visor.clientWidth/Math.max(1,visor.clientHeight),.1,450);
+const controles=new OrbitControls(camara,renderer.domElement);
+controles.enableDamping=true;
+controles.dampingFactor=.075;
+controles.minDistance=15;
+controles.maxDistance=180;
+controles.maxPolarAngle=Math.PI/2-0.04;
+controles.target.set(0,0,0);
+
+escena.add(new THREE.HemisphereLight('#e7f5ff','#607080',2.25));
+const sol=new THREE.DirectionalLight('#fff7eb',2.9);
+sol.position.set(-48,90,45);
+sol.castShadow=true;
+sol.shadow.mapSize.set(2048,2048);
+sol.shadow.camera.left=-88;sol.shadow.camera.right=88;
+sol.shadow.camera.top=88;sol.shadow.camera.bottom=-88;
+sol.shadow.normalBias=.04;
+escena.add(sol);
+
+const objetosSeleccionables=[];
+const campus=new THREE.Group();
+escena.add(campus);
+const capaEtiquetas=new THREE.Group();
+capaEtiquetas.name='Etiquetas';campus.add(capaEtiquetas);
+const {suelo,extras,perimetro}=crearExteriores(campus);
+const bebederos=crearBebederos(extras);
+crearExpendedoras(extras);
+const torres=crearTorres(campus,objetosSeleccionables,capaEtiquetas);
+compactarFranja(campus);
+// Conserva la posición del cerco posterior al estrechar desde el frente (+Z).
+const cercoPosterior=-CONFIG.fondoCampus/2;
+campus.scale.z=CONFIG.escalaLongitudinalCampus;
+campus.position.z=cercoPosterior*(.85-campus.scale.z);
+campus.updateMatrixWorld(true);
+ajustarPizarraFinal(campus);
+const puertasFachada=crearPuertasFachada(escena);
+const zonaElevadores=escena.getObjectByName('Área de elevadores').userData.zonaElevadores;
+const elevadores=crearServicioElevadores(zonaElevadores);
+let interiorElevadores=false;
+const recorrido=crearRecorrido({escena,campus,camara,controles,canvas:renderer.domElement,
+  visor,etiquetas,suelo,extras,perimetro,capaEtiquetas,elevadores});
+
+function encuadrarCampus(x,y,z,objetivoX,objetivoY,objetivoZ){
+  campus.localToWorld(camara.position.set(ajustarX(x),y,ajustarZ(z,x)));
+  campus.localToWorld(controles.target.set(ajustarX(objetivoX),objetivoY,ajustarZ(objetivoZ,objetivoX)));
+  controles.update();
+}
+
+function vistaGeneral(){
+  recorrido.salir();
+  controles.minDistance=15;interiorElevadores=false;
+  camara.fov=48;camara.updateProjectionMatrix();
+  encuadrarCampus(75,85,105,0,.2,0);
+  document.querySelectorAll('[data-focus]').forEach(b=>b.classList.remove('active'));
+}
+function enfocarTorre(id){
+  recorrido.salir();
+  const t=CONFIG.torres[id];
+  encuadrarCampus(t.x+25,49,t.z+53,t.x,0,t.z);
+  document.querySelectorAll('[data-focus]').forEach(b=>b.classList.toggle('active',b.dataset.focus===id));
+  mostrarInfo(`Torre ${id}`,t.descripcion,`TORRE ${id}`,'PRIMER PISO');
+}
+function mostrarInfo(nombre,descripcion,torre,tipo){
+  document.querySelector('#selected-name').textContent=nombre;
+  document.querySelector('#selected-description').textContent=descripcion;
+  document.querySelector('#selected-tower').textContent=torre;
+  document.querySelector('#selected-category').textContent=tipo;
+}
+vistaGeneral();
+// En las vistas de detalle solo se muestra el nombre del edificio enfocado.
+let ladoIngreso=1;
+function encuadrarIngreso(lado){
+  ladoIngreso=lado;
+  // Las vistas de detalle siguen la posición del ingreso.
+  const x=CONFIG.ingreso.x+CONFIG.ingreso.desplazamientoX+
+    CONFIG.ingreso.bordeIzquierdo*(1-CONFIG.ingreso.escalaAncho);
+  const z=CONFIG.ingreso.z+CONFIG.ingreso.bordeFrontal*(1-CONFIG.ingreso.escalaFondo);
+  encuadrarCampus(x,4.5,z+lado*16*CONFIG.ingreso.escalaFondo,x,CONFIG.baseY+2.15,z);
+}
+document.addEventListener('click',e=>{
+  const boton=e.target.closest('button');
+  if(boton)visor.classList.toggle('ingreso-enfocado',
+    boton.id==='btn-ver-ingreso'||boton.id==='btn-ver-ingreso-exterior');
+});
+document.querySelector('#btn-ver-elevadores').addEventListener('click',()=>{
+  recorrido.salir();
+  const centro=zonaElevadores.grupo.getWorldPosition(new THREE.Vector3());
+  camara.position.set(centro.x+18,22,centro.z+22);
+  controles.target.set(centro.x,CONFIG.baseY+1,centro.z);controles.update();
+  mostrarInfo('Elevadores · Torre B','Seis cabinas: cuatro a la izquierda y dos a la derecha desde Torre A. Puertas de acero, paredes cálidas y franja central clara. Entra en tercera persona para viajar del piso 1 al 11.','TORRE B','ELEVADORES');
+});
+document.querySelector('#btn-interior-elevadores').addEventListener('click',()=>{
+  recorrido.salir();interiorElevadores=true;controles.minDistance=.5;
+  camara.fov=75;camara.updateProjectionMatrix();
+  const punto=zonaElevadores.grupo.localToWorld(new THREE.Vector3(zonaElevadores.ancho/2-.65,CONFIG.baseY+1.75,0));
+  camara.position.copy(punto);controles.target.copy(punto).add(new THREE.Vector3(-10,0,0));controles.update();
+  capaEtiquetas.visible=false;document.querySelector('#toggle-etiquetas').checked=false;
+  mostrarInfo('Vestíbulo · 6 ascensores','Cuatro a la izquierda y dos a la derecha. Puertas metálicas, franja clara central y techo oscuro con luminarias, según el video.','TORRE B','INTERIOR');
+});
+document.querySelector('#btn-lateral-c').addEventListener('click',()=>{
+  recorrido.salir();controles.minDistance=3;
+  encuadrarCampus(-84,58,62,-47,2,5);
+  capaEtiquetas.visible=false;document.querySelector('#toggle-etiquetas').checked=false;
+  mostrarInfo('Jardín y comedor · Torre C','Jardinera de plantas verdes y moradas con piedras, pasillo de piedra, fachada de vidrio y comedor con sillas azules bajo lona tensada.','TORRE C','LATERAL');
+});
+document.querySelector('#btn-comedor-c').addEventListener('click',()=>{
+  recorrido.salir();controles.minDistance=.5;
+  encuadrarCampus(-40.3,CONFIG.baseY+2.3,14.1,-47,CONFIG.baseY+1.5,27);
+  capaEtiquetas.visible=false;document.querySelector('#toggle-etiquetas').checked=false;
+  mostrarInfo('Comedor exterior · Torre C','Mesas claras, sillas azules y fachada acristalada bajo una lona tensada, junto al jardín ornamental.','TORRE C','COMEDOR');
+});
+document.querySelector('#btn-subterraneo-c').addEventListener('click',()=>{
+  recorrido.salir();controles.minDistance=3;
+  encuadrarCampus(-40,35,-56,-48,2,-20);
+  capaEtiquetas.visible=false;document.querySelector('#toggle-etiquetas').checked=false;
+  mostrarInfo('Acceso al subterráneo · Torre C','Desde la entrada: caseta de registro a la izquierda y rampa a la derecha, hacia el interior. Las plantas rodean la rampa. El frente está cerrado hasta el suelo y el cerco blanco y gris integra la caseta y ambos accesos.','TORRE C','SUBTERRÁNEO');
+});
+document.querySelector('#btn-cerco-c').addEventListener('click',()=>{
+  recorrido.salir();controles.minDistance=3;
+  encuadrarCampus(-47,7,-59,-47,2.8,-38);
+  capaEtiquetas.visible=false;document.querySelector('#toggle-etiquetas').checked=false;
+  mostrarInfo('Entrada y caseta · Torre C','Cerco continuo blanco y gris, base cerrada hasta el suelo, caseta de control a la izquierda y acceso vehicular a la derecha.','TORRE C','VISTA EXTERIOR');
+});
+document.querySelector('#btn-ver-ingreso').addEventListener('click',()=>{
+  recorrido.salir();
+  encuadrarIngreso(1);
+  mostrarInfo('Ingreso · Parte trasera','Seis torniquetes de acero, paso lateral y arco detector. La caja y los portones forman un solo conjunto bajo la misma cubierta.','INGRESO','PARTE TRASERA');
+  document.querySelectorAll('[data-focus]').forEach(b=>b.classList.remove('active'));
+});
+
+document.querySelector('#btn-ver-ingreso-exterior').addEventListener('click',()=>{
+  recorrido.salir();
+  encuadrarIngreso(-1);
+  mostrarInfo('Ingreso · Parte delantera','Caja integrada a la izquierda, ventanilla, rótulo del Centro Tecnológico, número 3365 y portones SENATI bajo una cubierta continua.','INGRESO','PARTE DELANTERA');
+  document.querySelectorAll('[data-focus]').forEach(b=>b.classList.remove('active'));
+});
+
+document.querySelector('#btn-ver-patio').addEventListener('click',()=>{
+  recorrido.salir();
+  encuadrarCampus(56,98,1,56,0,0);
+  mostrarInfo('Patio de Torre A · Croquis','El ingreso, el paseo de Torre A y el pasillo entre jardines conectan mediante un piso horizontal. La escalera doble frontal y la rampa exterior mantienen el acceso desde el nivel bajo.','TORRE A','PLANTA DEL PATIO');
+});
+document.querySelector('#btn-ver-fachadas').addEventListener('click',()=>{
+  recorrido.salir();
+  encuadrarCampus(87,17,7,35.5,3.5,1);
+  capaEtiquetas.visible=false;document.querySelector('#toggle-etiquetas').checked=false;
+  mostrarInfo('Conferencias y Atención al Estudiante','Paneles grises y claros; cinco puertas de conferencias y doble puerta delgada de vidrio en Experiencia Estudiantil.','TORRE A','FACHADAS');
+});
+document.querySelectorAll('[data-focus]').forEach(btn=>btn.addEventListener('click',()=>enfocarTorre(btn.dataset.focus)));
+document.querySelector('#btn-general').addEventListener('click',()=>{vistaGeneral();mostrarInfo('Vista general','Las torres C, B y A están alineadas de izquierda a derecha. El primer piso incluye zonas abiertas y espacios con columnas.','SENATI','CAMPUS');});
+document.querySelector('#btn-restablecer').addEventListener('click',vistaGeneral);
+document.querySelector('#btn-isometrica').addEventListener('click',vistaGeneral);
+document.querySelector('#btn-planta').addEventListener('click',()=>{
+  recorrido.salir();
+  encuadrarCampus(0,120,.1,0,0,0);
+});
+document.querySelector('#toggle-muros').addEventListener('change',e=>{perimetro.visible=e.target.checked;});
+document.querySelector('#toggle-exteriores').addEventListener('change',e=>{extras.visible=e.target.checked;});
+document.querySelector('#toggle-etiquetas').addEventListener('change',e=>{capaEtiquetas.visible=e.target.checked;});
+
+// Clic en un ambiente (no durante el arrastre de cámara).
+const raycaster=new THREE.Raycaster();
+const pointer=new THREE.Vector2();
+let alPulsar=null,seleccionado=null;
+renderer.domElement.addEventListener('pointerdown',e=>{alPulsar={x:e.clientX,y:e.clientY};});
+renderer.domElement.addEventListener('pointerup',e=>{
+  if(!alPulsar||Math.hypot(e.clientX-alPulsar.x,e.clientY-alPulsar.y)>6)return;
+  const r=renderer.domElement.getBoundingClientRect();
+  pointer.x=((e.clientX-r.left)/r.width)*2-1;
+  pointer.y=-((e.clientY-r.top)/r.height)*2+1;
+  raycaster.setFromCamera(pointer,camara);
+  // El primer objeto visible impide activar puertas a través de las paredes.
+  const visibles=[];
+  escena.traverseVisible(o=>{if(o.isMesh)visibles.push(o);});
+  const primerImpacto=raycaster.intersectObjects(visibles,false)[0];
+  if(primerImpacto&&bebederos.activar(primerImpacto.object))return;
+  if(primerImpacto&&puertasFachada.alternar(primerImpacto.object))return;
+  if(recorrido.activo)return;
+  const impactos=raycaster.intersectObjects(objetosSeleccionables,false);
+  if(!impactos.length)return;
+  const objeto=impactos[0].object;
+  if(seleccionado)seleccionado.material.emissive.set('#000000');
+  seleccionado=objeto;
+  seleccionado.material.emissive.set('#284558');
+  const info=objeto.userData.info;
+  mostrarInfo(info.nombre,info.descripcion,`TORRE ${info.torre}`,info.tipo.toUpperCase());
+});
+
+function redimensionar(){
+  const w=Math.max(1,visor.clientWidth),h=Math.max(1,visor.clientHeight);
+  camara.aspect=w/h;camara.updateProjectionMatrix();
+  if(visor.classList.contains('ingreso-enfocado'))encuadrarIngreso(ladoIngreso);
+  renderer.setSize(w,h);etiquetas.setSize(w,h);
+}
+const resizeObserver=new ResizeObserver(redimensionar);
+resizeObserver.observe(visor);
+let ultimoTiempo=performance.now();
+function animar(ahora=performance.now()){
+  const transcurrido=Math.min(Math.max((ahora-ultimoTiempo)/1000,0),1);
+  const dt=Math.min(transcurrido,.05);ultimoTiempo=ahora;
+  requestAnimationFrame(animar);
+  puertasFachada.actualizar(dt);
+  bebederos.actualizar(dt);
+  if(recorrido.activo)recorrido.actualizar(dt,transcurrido);
+  else controles.update();
+  for(const nivel of zonaElevadores.niveles.values())nivel.cubierta.visible=recorrido.activo||interiorElevadores;
+  renderer.render(escena,camara);
+  etiquetas.render(escena,camara);
+}
+animar();
+
+// Modelo del campus y configuración disponibles para inspección:
+window.SENATI3D={torres,escena,CONFIG};
