@@ -1,4 +1,4 @@
-# SENATI 3D — Torres Tecnológicas (planta baja)
+# SENATI 4D — Torres Tecnológicas (planta baja)
 
 **Versión:** 0.3, patio de Torre A actualizado al croquis del 10 de noviembre de 2026.
 
@@ -17,8 +17,8 @@ Esta maqueta en HTML, CSS, JavaScript y **Three.js** dibuja el **primer piso de 
 
 ## 1. Cómo abrir
 
-1. Descomprime `SENATI-3D.zip` en tu computadora.
-2. Abre la carpeta `SENATI-3D` en **Visual Studio Code**.
+1. Descomprime `SENATI-4D.zip` en tu computadora.
+2. Abre la carpeta `SENATI-4D` en **Visual Studio Code**.
 3. Instala la extensión **Live Server** si no la tienes.
 4. Abre `index.html` y pulsa **Go Live** o clic derecho → **Open with Live Server**.
 5. Se abrirá la maqueta en tu navegador; necesitas internet para cargar Three.js desde jsDelivr.
@@ -50,7 +50,7 @@ No abras `index.html` haciendo doble clic: un servidor local evita problemas con
 ## 3. Archivos principales
 
 ```text
-SENATI-3D/
+SENATI-4D/
 ├── index.html                     Interfaz web y carga de librerías
 ├── css/estilos.css                Diseño responsive
 ├── js/
