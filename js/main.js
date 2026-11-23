@@ -39,8 +39,8 @@ etiquetas.domElement.style.pointerEvents='none';
 visor.appendChild(etiquetas.domElement);
 
 const escena=new THREE.Scene();
-escena.background=new THREE.Color('#273b4e');
-escena.fog=new THREE.Fog('#273b4e',155,275);
+escena.background=new THREE.Color('#a8d0eb');
+escena.fog=new THREE.Fog('#a8d0eb',155,275);
 const camara=new THREE.PerspectiveCamera(48,visor.clientWidth/Math.max(1,visor.clientHeight),.1,450);
 const controles=new OrbitControls(camara,renderer.domElement);
 controles.enableDamping=true;
@@ -50,7 +50,8 @@ controles.maxDistance=180;
 controles.maxPolarAngle=Math.PI/2-0.04;
 controles.target.set(0,0,0);
 
-escena.add(new THREE.HemisphereLight('#e7f5ff','#607080',2.25));
+const luzCielo=new THREE.HemisphereLight('#e7f5ff','#607080',2.25);
+escena.add(luzCielo);
 const sol=new THREE.DirectionalLight('#fff7eb',2.9);
 sol.position.set(-48,90,45);
 sol.castShadow=true;
@@ -59,6 +60,35 @@ sol.shadow.camera.left=-88;sol.shadow.camera.right=88;
 sol.shadow.camera.top=88;sol.shadow.camera.bottom=-88;
 sol.shadow.normalBias=.04;
 escena.add(sol);
+
+// Alterna el ambiente real de la maqueta 3D y recuerda la elección.
+const btnModoAmbiente=document.querySelector('#btn-modo-ambiente');
+const CLAVE_MODO='senati3d-modo-ambiente';
+function configurarModoAmbiente(noche){
+  const cielo=noche?'#071526':'#a8d0eb';
+  escena.background.set(cielo);
+  escena.fog.color.set(cielo);
+  luzCielo.color.set(noche?'#8ca9da':'#e7f5ff');
+  luzCielo.groundColor.set(noche?'#293b59':'#607080');
+  luzCielo.intensity=noche?0.82:2.25;
+  sol.color.set(noche?'#adc6ff':'#fff7eb');
+  sol.intensity=noche?0.95:2.9;
+  renderer.toneMappingExposure=noche?1.05:1.35;
+  document.body.classList.toggle('modo-noche',noche);
+  btnModoAmbiente.textContent=noche?'🌙 Noche':'☀️ Día';
+  btnModoAmbiente.setAttribute('aria-pressed',String(noche));
+  const accion=noche?'Cambiar a modo día':'Cambiar a modo noche';
+  btnModoAmbiente.setAttribute('aria-label',accion);
+  btnModoAmbiente.title=accion;
+}
+let modoNocturno=false;
+try{modoNocturno=localStorage.getItem(CLAVE_MODO)==='noche';}catch(_error){}
+configurarModoAmbiente(modoNocturno);
+btnModoAmbiente.addEventListener('click',()=>{
+  modoNocturno=!modoNocturno;
+  configurarModoAmbiente(modoNocturno);
+  try{localStorage.setItem(CLAVE_MODO,modoNocturno?'noche':'dia');}catch(_error){}
+});
 
 const objetosSeleccionables=[];
 const campus=new THREE.Group();

@@ -89,3 +89,26 @@ button:focus-visible {outline:2px solid #9ceaff;outline-offset:3px;}
 @media(max-width:760px){.topbar{height:66px;padding:0 14px}.status{display:none}.brand h1{font-size:20px}.layout{display:flex;flex-direction:column}.sidebar{order:2;border-right:0;border-top:1px solid var(--line)}.stage{order:1}.viewer{height:62vh;min-height:380px}.viewer-help{font-size:10px;padding:7px 9px;white-space:normal;bottom:8px}.viewer-actions button span{display:none}.scene-subtitle{display:none}.selection-card{align-items:flex-start}}
 .viewer.ingreso-enfocado .zone-label:not(.ingreso-label),
 .viewer.ingreso-enfocado .tower-label { visibility: hidden; }
+
+/* Control accesible de día y noche */
+.modo-ambiente {
+  border:1px solid #4b7496;
+  border-radius:999px;
+  background:#1c3854;
+  color:#f3fbff;
+  font-weight:800;
+  font-size:12px;
+  padding:9px 14px;
+  white-space:nowrap;
+  transition:background .2s,border-color .2s,transform .2s;
+}
+.modo-ambiente:hover {background:#285a7b;transform:translateY(-1px);}
+.modo-ambiente[aria-pressed="true"] {background:#10203e;border-color:#86a7e4;color:#e4edff;}
+.modo-noche .topbar {background:#070e1f;}
+.modo-noche .stage {background:#070d1c;}
+.modo-noche .viewer {border-color:#456492;background:#081428;}
+.modo-noche .scene-chip {background:#111b41e8;border-color:#5575bd;color:#d3e0ff;}
+@media(max-width:760px) {
+  .topbar-right .level-tag {display:none;}
+  .modo-ambiente {padding:8px 11px;font-size:11px;}
+}
