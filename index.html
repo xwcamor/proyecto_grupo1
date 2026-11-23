@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101b2d">
+  <meta name="description" content="Cancha — noticias, análisis y agenda deportiva.">
+  <title>CANCHA | Todo el deporte en un solo lugar</title>
+  <style>
+    :root{--bg:#f4f6fa;--ink:#101b2d;--muted:#667085;--navy:#101b2d;--lime:#c8f169;--card:#fff;--line:#e6eaf0;--shadow:0 12px 35px #17243a12}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    a{color:inherit;text-decoration:none}button,input{font:inherit}.topline{height:5px;background:linear-gradient(90deg,var(--lime) 0 25%,#253b5c 25% 100%)}
+    header{background:var(--navy);color:white;position:sticky;top:0;z-index:10;box-shadow:0 5px 20px #07111f25}
+    .nav{max-width:1180px;margin:auto;padding:17px 24px;display:flex;align-items:center;gap:30px}.brand{font-weight:950;font-size:27px;letter-spacing:-1.8px}.brand span{color:var(--lime)}.navlinks{display:flex;gap:23px;margin-left:auto;font-size:13px;font-weight:750;color:#d4dbe6}.navlinks a:hover{color:var(--lime)}.menu{display:none;background:none;border:1px solid #ffffff44;color:white;border-radius:9px;padding:8px 11px}
+    .wrap{max-width:1180px;margin:auto;padding:0 24px}.hero{padding:36px 0 28px;display:grid;grid-template-columns:1.45fr .85fr;gap:20px}.hero-main{min-height:380px;border-radius:22px;overflow:hidden;position:relative;background:linear-gradient(90deg,#0b1728f2 0%,#0b1728a8 58%,#0b172800),url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1400&q=85') center/cover;color:white;display:flex;align-items:end;padding:38px}
+    .eyebrow{font-size:11px;font-weight:900;letter-spacing:1.7px;text-transform:uppercase;color:var(--lime)}.hero h1{font-size:clamp(32px,4.5vw,54px);line-height:1.02;letter-spacing:-2px;max-width:650px;margin:12px 0}.hero p{color:#d8e0ea;max-width:540px;line-height:1.6;font-size:14px}.pill{display:inline-block;background:var(--lime);color:var(--navy);padding:7px 11px;border-radius:30px;font-size:10px;font-weight:950;text-transform:uppercase;letter-spacing:.8px}
+    .hero-side{display:grid;grid-template-rows:1fr 1fr;gap:20px}.side-card{border-radius:20px;overflow:hidden;position:relative;min-height:180px;background-size:cover;background-position:center;color:white;display:flex;align-items:end;padding:23px}.side-card:before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#0b1728e8,transparent 85%)}.side-card>*{position:relative}.side-card h2{font-size:21px;line-height:1.15;margin:8px 0 0;max-width:340px}.side-one{background-image:url('https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=900&q=80')}.side-two{background-image:url('https://images.unsplash.com/photo-1460058416578-c6c4c5f0f4f5?auto=format&fit=crop&w=900&q=80')}
+    .ticker{background:var(--lime);color:var(--navy);padding:12px 0;font-size:12px;font-weight:900;letter-spacing:.4px}.ticker .wrap{display:flex;gap:18px;align-items:center}.ticker strong{background:var(--navy);color:white;padding:5px 8px;border-radius:4px;font-size:10px}
+    section{padding:28px 0}.section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:19px}.section-head h2{font-size:27px;letter-spacing:-1px;margin:0}.section-head p{margin:5px 0 0;color:var(--muted);font-size:13px}.filters{display:flex;gap:8px;flex-wrap:wrap}.filter{border:1px solid var(--line);background:white;color:var(--muted);padding:8px 13px;border-radius:30px;font-size:11px;font-weight:800;cursor:pointer}.filter.active,.filter:hover{background:var(--navy);border-color:var(--navy);color:white}
+    .toolbar{display:flex;gap:10px;margin:0 0 18px}.search{width:min(100%,320px);padding:11px 14px;border:1px solid var(--line);border-radius:11px;background:white;outline:none}.search:focus{border-color:#8aa94b;box-shadow:0 0 0 3px #c8f16955}
+    .news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.news-card{background:var(--card);border:1px solid var(--line);border-radius:17px;overflow:hidden;box-shadow:var(--shadow);transition:transform .2s}.news-card:hover{transform:translateY(-4px)}.news-card img{width:100%;height:185px;object-fit:cover;display:block}.news-body{padding:18px}.meta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px}.tag{color:#49651d}.news-body h3{font-size:19px;line-height:1.2;letter-spacing:-.5px;margin:12px 0 8px}.news-body p{font-size:13px;line-height:1.55;color:var(--muted);margin:0 0 16px}.readmore{font-size:11px;font-weight:900;border:0;background:none;padding:0;cursor:pointer;color:#314b17}.empty{grid-column:1/-1;background:white;border-radius:14px;padding:35px;text-align:center;color:var(--muted)}
+    .lower{display:grid;grid-template-columns:1.2fr .8fr;gap:20px}.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow)}.panel h2{font-size:22px;margin:0 0 17px;letter-spacing:-.7px}.match{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line);gap:10px}.match:last-child{border:0}.match small{display:block;color:var(--muted);font-size:10px;margin-bottom:5px}.teams{font-size:13px;font-weight:850}.versus{color:var(--muted);font-size:11px}.status{font-size:10px;font-weight:900;background:#f0f4e8;color:#4e681e;padding:6px 8px;border-radius:20px;white-space:nowrap}.sport-links{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sport-link{background:#f4f6fa;border-radius:12px;padding:15px;font-weight:900;font-size:13px;transition:background .2s}.sport-link:hover{background:#eaf4d6}.sport-link span{display:block;font-size:20px;margin-bottom:7px}
+    .newsletter{margin:10px 0 45px;background:var(--navy);color:white;border-radius:20px;padding:28px;display:flex;align-items:center;justify-content:space-between;gap:20px}.newsletter h2{margin:0 0 6px;font-size:23px}.newsletter p{margin:0;color:#c4cedb;font-size:13px}.subscribe{display:flex;gap:8px;min-width:min(100%,370px)}.subscribe input{min-width:0;flex:1;border:0;border-radius:9px;padding:12px}.subscribe button{border:0;border-radius:9px;background:var(--lime);font-weight:950;padding:0 15px;cursor:pointer;color:var(--navy)}
+    footer{background:#0a1423;color:#b9c4d2;padding:28px 0;font-size:12px}.foot{display:flex;justify-content:space-between;gap:20px;align-items:center}.foot strong{font-size:20px;color:white}
+    .modal{position:fixed;inset:0;background:#07111fbd;display:none;place-items:center;padding:20px;z-index:30}.modal.open{display:grid}.modal-box{max-width:600px;width:100%;background:white;border-radius:18px;padding:26px;position:relative;max-height:85vh;overflow:auto}.modal-box h2{margin:8px 0}.modal-box p{color:#596579;line-height:1.7}.close{position:absolute;right:16px;top:12px;border:0;background:#eef1f5;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:18px}
+    @media(max-width:850px){.hero{grid-template-columns:1fr}.hero-side{grid-template-columns:1fr 1fr;grid-template-rows:1fr}.news-grid{grid-template-columns:repeat(2,1fr)}.lower{grid-template-columns:1fr}.newsletter{align-items:flex-start;flex-direction:column}.subscribe{width:100%}}
+    @media(max-width:600px){.nav{padding:14px 18px}.menu{display:block;margin-left:auto}.navlinks{display:none;position:absolute;top:60px;left:0;right:0;background:var(--navy);padding:18px 24px;flex-direction:column;gap:17px}.navlinks.show{display:flex}.wrap{padding:0 17px}.hero{padding-top:20px}.hero-main{min-height:350px;padding:25px}.hero-side{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.side-card{min-height:160px}.section-head{align-items:flex-start;flex-direction:column}.news-grid{grid-template-columns:1fr}.news-card img{height:210px}.foot{flex-direction:column;align-items:flex-start}.ticker .wrap{font-size:10px}}
+  </style>
+</head>
+<body>
+  <div class="topline"></div>
+  <header>
+    <nav class="nav wrap" aria-label="Navegación principal">
+      <a class="brand" href="#">CANCHA<span>.</span></a>
+      <button class="menu" id="menuBtn" aria-label="Abrir menú">☰</button>
+      <div class="navlinks" id="navlinks">
+        <a href="#noticias">NOTICIAS</a><a href="#agenda">AGENDA</a><a href="#deportes">DEPORTES</a><a href="#boletin">BOLETÍN</a>
+      </div>
+    </nav>
+  </header>
+  <div class="ticker"><div class="wrap"><strong>EN CANCHA</strong><span>Pasión, análisis y actualidad deportiva en un solo lugar.</span></div></div>
+  <main class="wrap">
+    <section class="hero" aria-label="Noticias destacadas">
+      <article class="hero-main">
+        <div><span class="eyebrow">La pasión no se detiene · Especial deportivo</span><h1>EL DEPORTE SE VIVE. LA HISTORIA SE CUENTA.</h1><p>Entérate de lo que pasa en el fútbol, básquet, tenis y mucho más. Historias, análisis y momentos que nos unen.</p><a class="pill" href="#noticias">Explorar noticias ↓</a></div>
+      </article>
+      <div class="hero-side">
+        <article class="side-card side-one"><div><span class="eyebrow">Fútbol</span><h2>La emoción del juego empieza aquí</h2></div></article>
+        <article class="side-card side-two"><div><span class="eyebrow">En todas las disciplinas</span><h2>Más deportes. Más historias.</h2></div></article>
+      </div>
+    </section>
+    <section id="noticias">
+      <div class="section-head"><div><h2>Últimas historias</h2><p>Contenido destacado para los verdaderos aficionados.</p></div>
+        <div class="filters" id="filters"><button class="filter active" data-filter="Todos">Todos</button><button class="filter" data-filter="Fútbol">Fútbol</button><button class="filter" data-filter="Básquet">Básquet</button><button class="filter" data-filter="Tenis">Tenis</button><button class="filter" data-filter="Otros">Otros</button></div>
+      </div>
+      <div class="toolbar"><input class="search" id="searchInput" type="search" placeholder="Buscar una noticia..." aria-label="Buscar noticias"></div>
+      <div class="news-grid" id="newsGrid">
+        <article class="news-card" data-category="Fútbol" data-title="táctica fútbol trabajo en equipo"><img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=900&q=80" alt="Estadio de fútbol iluminado"><div class="news-body"><div class="meta"><span class="tag">Fútbol</span><span>5 min de lectura</span></div><h3>El fútbol moderno: táctica, intensidad y trabajo en equipo</h3><p>Un vistazo a cómo la preparación física y la estrategia transforman la manera de competir.</p><button class="readmore" data-story="futbol">LEER HISTORIA →</button></div></article>
+        <article class="news-card" data-category="Básquet" data-title="basquet disciplina precisión cancha"><img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=900&q=80" alt="Balón de básquet en una cancha"><div class="news-body"><div class="meta"><span class="tag">Básquet</span><span>4 min de lectura</span></div><h3>Básquet: velocidad, precisión y decisiones en segundos</h3><p>El deporte de equipo donde cada pase puede cambiar el rumbo del partido.</p><button class="readmore" data-story="basquet">LEER HISTORIA →</button></div></article>
+        <article class="news-card" data-category="Tenis" data-title="tenis concentración entrenamiento"><img src="https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?auto=format&fit=crop&w=900&q=80" alt="Raqueta y pelota de tenis"><div class="news-body"><div class="meta"><span class="tag">Tenis</span><span>3 min de lectura</span></div><h3>Tenis: concentración y constancia punto a punto</h3><p>La fortaleza mental es una aliada esencial para competir al máximo nivel.</p><button class="readmore" data-story="tenis">LEER HISTORIA →</button></div></article>
+        <article class="news-card" data-category="Otros" data-title="atletismo entrenamiento resistencia"><img src="https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=900&q=80" alt="Atleta corriendo en una pista"><div class="news-body"><div class="meta"><span class="tag">Atletismo</span><span>6 min de lectura</span></div><h3>Atletismo: pequeños avances, grandes objetivos</h3><p>La disciplina diaria construye el camino hacia nuevas marcas personales.</p><button class="readmore" data-story="atletismo">LEER HISTORIA →</button></div></article>
+        <article class="news-card" data-category="Otros" data-title="ciclismo ruta resistencia estrategia"><img src="https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=900&q=80" alt="Ciclista entrenando en carretera"><div class="news-body"><div class="meta"><span class="tag">Ciclismo</span><span>4 min de lectura</span></div><h3>Ciclismo: resistencia, estrategia y pasión por la ruta</h3><p>Conoce los elementos que hacen de cada recorrido un desafío distinto.</p><button class="readmore" data-story="ciclismo">LEER HISTORIA →</button></div></article>
+        <article class="news-card" data-category="Fútbol" data-title="afición estadio comunidad fútbol"><img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=900&q=80" alt="Balón sobre el césped de un campo"><div class="news-body"><div class="meta"><span class="tag">Fútbol</span><span>5 min de lectura</span></div><h3>La afición: el jugador número doce</h3><p>El sentimiento de comunidad que convierte un encuentro en una experiencia inolvidable.</p><button class="readmore" data-story="aficion">LEER HISTORIA →</button></div></article>
+      </div>
+    </section>
+    <section class="lower" id="agenda">
+      <div class="panel"><h2>📅 Agenda deportiva</h2>
+        <div class="match"><div><small>FÚTBOL · EJEMPLO DE AGENDA</small><div class="teams">Equipo local <span class="versus">vs.</span> Equipo visitante</div></div><span class="status">Por programar</span></div>
+        <div class="match"><div><small>BÁSQUET · EJEMPLO DE AGENDA</small><div class="teams">Equipo A <span class="versus">vs.</span> Equipo B</div></div><span class="status">Por programar</span></div>
+        <div class="match"><div><small>TENIS · EJEMPLO DE AGENDA</small><div class="teams">Próximo torneo</div></div><span class="status">Consultar fecha</span></div>
+        <p style="font-size:11px;color:#8993a3;margin:14px 0 0">Agenda ilustrativa: consulta los calendarios oficiales para fechas, horarios y resultados confirmados.</p>
+      </div>
+      <div class="panel" id="deportes"><h2>Explora los deportes</h2><div class="sport-links">
+        <a class="sport-link" href="#noticias" data-sport="Fútbol"><span>⚽</span>Fútbol</a><a class="sport-link" href="#noticias" data-sport="Básquet"><span>🏀</span>Básquet</a><a class="sport-link" href="#noticias" data-sport="Tenis"><span>🎾</span>Tenis</a><a class="sport-link" href="#noticias" data-sport="Otros"><span>🏃</span>Atletismo</a><a class="sport-link" href="#noticias" data-sport="Otros"><span>🚴</span>Ciclismo</a><a class="sport-link" href="#noticias" data-sport="Todos"><span>🏆</span>Todos</a>
+      </div></div>
+    </section>
+    <section id="boletin"><div class="newsletter"><div><h2>El deporte en tu bandeja</h2><p>Suscríbete al boletín de CANCHA y no te pierdas las próximas historias.</p></div><form class="subscribe" id="subscribeForm"><input type="email" id="emailInput" placeholder="Tu correo electrónico" required aria-label="Correo electrónico"><button type="submit">SUSCRIBIRME</button></form></div></section>
+  </main>
+  <footer><div class="wrap foot"><div><strong>CANCHA<span style="color:var(--lime)">.</span></strong><div>Pasión por el deporte, todos los días.</div></div><div>© <span id="year"></span> CANCHA. Sitio demostrativo.</div></div></footer>
+  <div class="modal" id="storyModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-box"><button class="close" id="closeModal" aria-label="Cerrar">×</button><span class="eyebrow">CANCHA · REPORTAJE</span><h2 id="modalTitle"></h2><p id="modalText"></p></div></div>
+  <script>
+    const filters = document.querySelectorAll('.filter');
+    const cards = [...document.querySelectorAll('.news-card')];
+    const search = document.getElementById('searchInput');
+    let activeFilter = 'Todos';
+    function applyFilters(){
+      const term = search.value.trim().toLocaleLowerCase('es');
+      let visible = 0;
+      cards.forEach(card=>{
+        const categoryOK = activeFilter==='Todos' || card.dataset.category===activeFilter;
+        const textOK = (card.dataset.title+' '+card.innerText).toLocaleLowerCase('es').includes(term);
+        card.hidden = !(categoryOK && textOK);
+        if(!card.hidden) visible++;
+      });
+      let empty = document.getElementById('emptyState');
+      if(!visible && !empty){empty=document.createElement('div');empty.id='emptyState';empty.className='empty';empty.textContent='No encontramos noticias con esos filtros.';document.getElementById('newsGrid').appendChild(empty)}
+      if(visible && empty) empty.remove();
+    }
+    filters.forEach(btn=>btn.addEventListener('click',()=>{
+      filters.forEach(b=>b.classList.remove('active'));btn.classList.add('active');activeFilter=btn.dataset.filter;applyFilters();
+    }));
+    search.addEventListener('input',applyFilters);
+    document.querySelectorAll('[data-sport]').forEach(link=>link.addEventListener('click',()=>{
+      const choice=link.dataset.sport;activeFilter=choice;filters.forEach(b=>b.classList.toggle('active',b.dataset.filter===choice));applyFilters();
+    }));
+    const stories={
+      futbol:['El fútbol moderno','El fútbol actual combina preparación física, lectura táctica y coordinación colectiva. La presión organizada, las transiciones rápidas y el análisis del rival son herramientas que ayudan a los equipos a competir mejor. Esta nota es un contenido editorial introductorio, no un reporte de un partido reciente.'],
+      basquet:['Básquet: decisiones en segundos','En el básquet, el espacio y el tiempo son fundamentales. Un equipo necesita comunicación, buenos fundamentos y capacidad para adaptarse a cada posesión. El pase, el movimiento sin balón y la defensa colectiva pueden marcar la diferencia.'],
+      tenis:['Tenis: mente y técnica','El tenis exige combinar técnica, condición física y concentración. Cada punto plantea un nuevo reto: elegir el golpe adecuado, controlar los nervios y mantener un plan de juego durante todo el encuentro.'],
+      atletismo:['Atletismo: progreso constante','El entrenamiento atlético se construye con objetivos realistas, descanso y constancia. Registrar los avances y cuidar la recuperación ayuda a mejorar el rendimiento de forma sostenible.'],
+      ciclismo:['Ciclismo: estrategia sobre ruedas','La preparación para una ruta incluye administrar el esfuerzo, conocer el terreno y mantener una buena hidratación. La estrategia y la resistencia se complementan en cada recorrido.'],
+      aficion:['La afición y el deporte','Los aficionados aportan identidad y energía a los equipos. El respeto, la convivencia y el apoyo responsable hacen que el deporte sea una experiencia compartida dentro y fuera del estadio.']
+    };
+    const modal=document.getElementById('storyModal');
+    document.querySelectorAll('[data-story]').forEach(btn=>btn.addEventListener('click',()=>{
+      const story=stories[btn.dataset.story];document.getElementById('modalTitle').textContent=story[0];document.getElementById('modalText').textContent=story[1];modal.classList.add('open');
+    }));
+    function closeModal(){modal.classList.remove('open')}
+    document.getElementById('closeModal').addEventListener('click',closeModal);
+    modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+    document.getElementById('menuBtn').addEventListener('click',()=>document.getElementById('navlinks').classList.toggle('show'));
+    document.querySelectorAll('#navlinks a').forEach(a=>a.addEventListener('click',()=>document.getElementById('navlinks').classList.remove('show')));
+    document.getElementById('subscribeForm').addEventListener('submit',e=>{e.preventDefault();alert('¡Gracias por suscribirte a CANCHA! Esta demostración no almacena correos.');e.target.reset()});
+    document.getElementById('year').textContent=new Date().getFullYear();
+  </script>
+</body>
+</html>
